@@ -1,8 +1,8 @@
 databaseChangeLog:
   - changeSet:
       id: vanchip_add_reserved_comments_0.1.2
-      author: Huiyun_He
-      comment: add commments for mms_document reserved column
+      author: Tao Zhou
+      comment: add commments for mms_material_lot and mms_material_lot_his reserved column
       dbms: oracle
       changes:
         - sqlFile:

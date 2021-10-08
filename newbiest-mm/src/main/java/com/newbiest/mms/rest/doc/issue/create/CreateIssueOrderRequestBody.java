@@ -32,10 +32,14 @@ public class CreateIssueOrderRequestBody extends RequestBody {
 	@ApiModelProperty(value = "操作的物料批次以及pickQty")
 	private List<MaterialLot> materialLots;
 
-	@ApiModelProperty(value="具体的物料动作")
+	@ApiModelProperty(value="动作原因/备注")
 	private MaterialLotAction materialLotAction;
 
 	private String materialName;
+	//领料人
 	private String creator;
+
 	private BigDecimal qty;
+	//备注
+	private String partComments;
 }
