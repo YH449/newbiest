@@ -21,15 +21,14 @@ public class VcTriggerConfigure implements SchedulingConfigurer {
     VanChipService vanChipService;
 
     @Override
-    public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
-        scheduledTaskRegistrar.setScheduler(taskExecutor());
-        scheduledTaskRegistrar.addCronTask(new AsyncPreWaringThread(vanChipService), AsyncPreWaringThread.CRON_EXPRESS);
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.setScheduler(taskExecutor());
+        taskRegistrar.addCronTask(new AsyncPreWaringThread(vanChipService), AsyncPreWaringThread.CRON_EXPRESS);
+        taskRegistrar.addCronTask(new AsyncIncomingMLotThread(vanChipService), AsyncIncomingMLotThread.CRON_EXPRESS);
+        taskRegistrar.addCronTask(new AsyncDeliveryOrderThread(vanChipService), AsyncDeliveryOrderThread.CRON_EXPRESS);
+
     }
 
-    /**
-     * 创建trigger的线程池，线程池大小为triggerInst长度+Daemon线程
-     * @return
-     */
     @Bean(destroyMethod="shutdown")
     public Executor taskExecutor() {
         return new ScheduledThreadPoolExecutor(5);

@@ -94,6 +94,8 @@ public interface VanChipService {
     void preWarning() throws ClientException;
 
     Parts saveParts(Parts parts) throws ClientException;
+
+    void sendMLotInvByErp(DocumentLine documentLine, List<MaterialLotAction> materialLotActions) throws ClientException;
     void checkMLotInventorys(DocumentLine documentLine,List<MaterialLotAction> materialLotActions) throws ClientException;
     void recheckMLotInventorys(DocumentLine documentLine,List<MaterialLotAction> materialLotActions) throws ClientException;
     List<MaterialLot> getRecheckMLots(DocumentLine documentLine)throws ClientException;
@@ -106,8 +108,8 @@ public interface VanChipService {
 
     MaterialLot getBoxMLotBySubBoxMLotId(String subBoxMLotId) throws ClientException;
     void printBoxMLot(String subBoxMaterialLotId, MaterialLotAction materialLotAction, Boolean validationPrintFlag) throws ClientException;
-    void printRYBoxMLot(String subBoxMaterialLotId, MaterialLotAction materialLotAction, Boolean validationPrintFlag) throws ClientException;
     void iqcApprove(List<MaterialLotAction> materialLotActions) throws ClientException;
+    void startIqc(List<String> materialLotIds)throws ClientException;
 
     List<MaterialLot> getReservedMLotByOrder(String documentLineId)throws ClientException;
     void stockUpMLot(String documentLineId, List<MaterialLot> materialLots)throws ClientException;
@@ -118,4 +120,14 @@ public interface VanChipService {
     void returnMLotByDocLine(String documentId, List<MaterialLot> materialLotList) throws ClientException;
     void scrapMLot(String docId, List<MaterialLot> materialLotList)throws ClientException;
     void updateProductionDate(String materialLotId, String iclDateValue) throws ClientException;
+
+    void sendMailByPackingList() throws ClientException;
+    void asyncIncomingOrReturn() throws ClientException;
+    void asyncDeliveryInfo() throws ClientException;
+
+    DocumentLine deleteDeliveryOrder(String deliveryOrderLineId) throws ClientException;
+    Map<String, Object> buildBoxParameterMap(MaterialLot boxMaterialLot) throws ClientException;
+
+    List<MaterialLot> updateRmaNo(List<MaterialLot> materialLots, MaterialLotAction materialLotAction) throws ClientException;
+
 }

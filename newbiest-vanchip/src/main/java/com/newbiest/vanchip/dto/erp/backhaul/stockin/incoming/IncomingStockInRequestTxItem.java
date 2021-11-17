@@ -1,6 +1,7 @@
 package com.newbiest.vanchip.dto.erp.backhaul.stockin.incoming;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.newbiest.base.utils.StringUtils;
 import com.newbiest.mms.model.Material;
 import com.newbiest.mms.model.MaterialLot;
 import lombok.Data;
@@ -177,7 +178,6 @@ public class IncomingStockInRequestTxItem implements Serializable {
     private String FIELD4;
 
     public IncomingStockInRequestTxItem copyMaterialLotToRequestTxItem(MaterialLot materialLot, IncomingStockInRequestTxItem requestTxItem){
-        //requestTxItem.setZ_BATCH_PONUMBER(materialLot.getReserved6());
         requestTxItem.setZ_BATCH_CUSPO(materialLot.getReserved6());
         requestTxItem.setZ_BATCH_REMARK(materialLot.getIncomingComment());
         requestTxItem.setZ_BATCH_DC(materialLot.getReserved9());
@@ -186,14 +186,16 @@ public class IncomingStockInRequestTxItem implements Serializable {
         requestTxItem.setZ_BATCH_MRB_CODE(materialLot.getReserved16());
         requestTxItem.setZ_BATCH_BONBOOK(materialLot.getReserved19());
         requestTxItem.setZ_BATCH_ABNO(materialLot.getReserved54());
-        requestTxItem.setZ_BATCH_WMSBATCH(materialLot.getMaterialLotId());
         requestTxItem.setZ_BATCH_GFNO(materialLot.getIncomingDocId());
         requestTxItem.setZ_BATCH_INTERORDOR(materialLot.getReserved8());
 
         if (materialLot.getMaterialCategory().equals(Material.MATERIAL_CATEGORY_MAIN_MATERIAL)) {
             requestTxItem.setZ_BATCH_BOXNO(materialLot.getMaterialLotId());
-        }else if (materialLot.getMaterialCategory().equals(Material.MATERIAL_CATEGORY_PRODUCT)){
+            requestTxItem.setZ_BATCH_WMSBATCH(materialLot.getMaterialLotId());
+        }
+        if (!StringUtils.isNullOrEmpty(materialLot.getRmaFlag())){
             requestTxItem.setZ_BATCH_REEL(materialLot.getMaterialLotId());
+            requestTxItem.setZ_BATCH_TBATCH(materialLot.getMaterialLotId());
         }
         requestTxItem.setZ_BATCH_CONTROLLOT(materialLot.getReserved4());
         requestTxItem.setZ_BATCH_CUSLOTNO(materialLot.getReserved5());

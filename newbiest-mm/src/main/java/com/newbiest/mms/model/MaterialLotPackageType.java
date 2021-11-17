@@ -4,16 +4,19 @@ import com.newbiest.base.dto.Action;
 import com.newbiest.base.exception.ClientException;
 import com.newbiest.base.exception.ClientParameterException;
 import com.newbiest.base.model.NBUpdatable;
+import com.newbiest.base.utils.CollectionUtils;
 import com.newbiest.base.utils.StringUtils;
 import com.newbiest.mms.dto.MaterialLotAction;
 import com.newbiest.mms.exception.MmsException;
 import com.newbiest.mms.state.model.MaterialStatusCategory;
 import lombok.extern.slf4j.Slf4j;
 
-import javax.persistence.*;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -24,6 +27,16 @@ import java.util.stream.Collectors;
 @DiscriminatorValue(PackageType.CLASS_MATERIAL_LOT)
 @Slf4j
 public class MaterialLotPackageType extends PackageType {
+
+    /**
+     *最终客户 荣耀
+     */
+    public static final String FINAL_CUSTOMER_RY = "RY" ;
+
+    /**
+     *最终客户 小米
+     */
+    public static final String FINAL_CUSTOMER_XM = "XM" ;
 
     @Override
     public void validationPacking(List<? extends NBUpdatable> packageChildren) {
@@ -89,5 +102,51 @@ public class MaterialLotPackageType extends PackageType {
         }
         return BigDecimal.ZERO;
     }
+
+    /**
+     * vanChip 客制化验证
+     * bin3 + 最终客户 => RY 验证DC
+     * bin3 + 最终客户 => XM 验证CONTROL LOT
+     */
+    public void validationCustomizationPackageRule(String finalCustomer, String grade, List<MaterialLotUnit> materialLotUnits){
+        if (StringUtils.isNullOrEmpty(finalCustomer) || StringUtils.isNullOrEmpty(grade)) {
+            return;
+        }
+        if (FINAL_CUSTOMER_XM.equals(finalCustomer) && "PASS_BIN3".equals(grade)){
+            this.validationControlLot(materialLotUnits);
+        }else if (FINAL_CUSTOMER_RY.equals(finalCustomer) && "PASS_BIN3".equals(grade)){
+            this.validationDC(materialLotUnits);
+        }
+    }
+
+    /**
+     * 验证control Lot规则
+     */
+    public void validationControlLot(List<MaterialLotUnit> materialLotUnits){
+        if (StringUtils.isNullOrEmpty(reserved1) || CollectionUtils.isEmpty(materialLotUnits)){
+            return;
+        }
+        Integer maxControlLotQty = Integer.valueOf(reserved1);
+        Set<String> controlLotSet = materialLotUnits.stream().map(unit -> unit.getReserved4()).collect(Collectors.toSet());
+        if (controlLotSet.size() > maxControlLotQty){
+            throw new ClientParameterException(MmsException.MM_PACKAGE_OVER_MAX_CONTROL_LOT_QTY, maxControlLotQty);
+        }
+
+    }
+
+    /**
+     * 验证DC规则
+     */
+    public void validationDC(List<MaterialLotUnit> materialLotUnits){
+        if (StringUtils.isNullOrEmpty(reserved2) || CollectionUtils.isEmpty(materialLotUnits)){
+            return;
+        }
+        Integer maxDCQty = Integer.valueOf(reserved2);
+        Set<String> dcSet = materialLotUnits.stream().map(unit -> unit.getReserved2()).collect(Collectors.toSet());
+        if (dcSet.size() > maxDCQty){
+            throw new ClientParameterException(MmsException.MM_PACKAGE_OVER_MAX_DC_QTY, maxDCQty);
+        }
+    }
+
 
 }

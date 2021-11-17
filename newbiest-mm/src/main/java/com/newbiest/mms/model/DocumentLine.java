@@ -1,6 +1,9 @@
 package com.newbiest.mms.model;
 
+import com.newbiest.base.exception.ClientException;
+import com.newbiest.base.exception.ClientParameterException;
 import com.newbiest.base.model.NBUpdatable;
+import com.newbiest.mms.exception.DocumentException;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,10 +19,16 @@ import java.util.Date;
 @Entity
 public class DocumentLine extends NBUpdatable {
 
+    public static final String STATUS_WAIT_DELETE = "WaitDelete";
+
+    public static final String STATUS_DELETE = "Delete";
+
     //发货类型
     public static final String MP_SHIPPING_TYPE = "量产";
     public static final String ES_SHIPPING_TYPE = "工程样品";
     public static final String CS_SHIPPING_TYPE = "客户样品";
+    public static final String RY_SHIPPING_TYPE = "RY";
+    public static final String TKY_SHIPPING_TYPE = "TKY";
 
     @Column(name="DOC_RRN")
     private String docRrn;
@@ -227,6 +236,8 @@ public class DocumentLine extends NBUpdatable {
      * 1.量产
      * 2.工程样品
      * 3.客户样品
+     * 4.RY
+     * 5.TKY
      */
     @Column(name="RESERVED27")
     private String reserved27;
@@ -278,6 +289,19 @@ public class DocumentLine extends NBUpdatable {
      */
     @Column(name="RESERVED35")
     private String reserved35;
+
+    /**
+     * 终端客户
+     */
+    @Column(name="RESERVED36")
+    private String reserved36;
+
+    /**
+     * 货架位
+     */
+    @Column(name="RESERVED37")
+    private String reserved37;
+
     /**
      * 导入时格式转换
      */
@@ -312,5 +336,17 @@ public class DocumentLine extends NBUpdatable {
         this.docRrn = document.getObjectRrn();
         this.docId = document.getName();
         this.docCategory = document.getCategory();
+    }
+
+    /**
+     * 验证单据是否有删除标识。
+     * @return
+     * @throws ClientException
+     */
+    public DocumentLine validateDelete() throws ClientException {
+        if (STATUS_WAIT_DELETE.equals(this.status) || STATUS_DELETE.equals(this.status) ) {
+            throw new ClientParameterException(DocumentException.DOC_ALREADY_DELETED, this.lineId);
+        }
+        return this;
     }
 }
