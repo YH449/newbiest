@@ -130,7 +130,6 @@ public class PrintServiceImpl implements PrintService {
      * @param parameterMap  参数MAP
      * @throws ClientException
      */
-    @Async
     public void printOPPOBoxTagMLot(MaterialLot boxMaterialLot, Map<String, Object> parameterMap) throws ClientException {
         try {
             PrintContext printContext = buildPrintContext(boxMaterialLot, LABEL_TEMPLATE_NAME_PRINT_OPPO_BOX_TAG_MLOT, parameterMap);
@@ -180,7 +179,6 @@ public class PrintServiceImpl implements PrintService {
      * @throws ClientException
      */
     @Override
-    @Async
     public void printBoxMLot(MaterialLot boxMLot) throws ClientException {
         try {
             Map<String, Object> parameterMap = buildBoxParameterMap(boxMLot);
@@ -220,6 +218,7 @@ public class PrintServiceImpl implements PrintService {
             parameterMap.put("deliveryNumber", deliveryOrderLine.getReserved21());
             parameterMap.put("shippingDate", shippingDate);
             parameterMap.put("poNumber", deliveryOrderLine.getReserved20());
+            parameterMap.put("customerName", deliveryOrderLine.getReserved11());
 
             String boxMaterialLotId = boxMaterialLot.getMaterialLotId();
             String boxNumber = boxMaterialLotId.substring(0, boxMaterialLotId.indexOf(StringUtils.SPLIT_CODE));
@@ -291,7 +290,6 @@ public class PrintServiceImpl implements PrintService {
     @Async
     public void printMLot(MaterialLot materialLot) throws ClientException {
         try {
-            Thread.sleep(100);
             Material material = materialRepository.findOneByName(materialLot.getMaterialName());
             String iqcFlag = "检验";
             if (StringUtils.isNullOrEmpty(material.getIqcSheetName())){
